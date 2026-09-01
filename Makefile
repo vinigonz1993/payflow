@@ -4,7 +4,7 @@ dev:
 	cd backend && npm run start:dev
 
 test:
-	cd backend && npm test
+	cd backend && npm test -- --coverage
 
 build:
 	cd backend && npm run build
