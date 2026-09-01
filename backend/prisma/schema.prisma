@@ -1,0 +1,18 @@
+generator client {
+    provider = "prisma-client"
+    output = "../src/generated"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Payment {
+    id          String   @id @default(uuid())
+    amount      Int
+    currency    String
+    recipientId String
+    status      String   @default("pending")
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
