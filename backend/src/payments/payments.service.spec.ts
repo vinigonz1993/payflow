@@ -11,6 +11,7 @@ describe('PaymentsService', () => {
     payment: {
       findMany: vi.fn(),
       create: vi.fn(),
+      findUnique: vi.fn(),
     }
   }
 
@@ -42,5 +43,39 @@ describe('PaymentsService', () => {
 
     const result = service.createPayment(paymentDto);
     expect(result).toBeDefined();
+  });
+
+  it('should retrieve a payment by id', () => {
+    const payment = {
+      id: 'payment_123',
+      amount: 100,
+      currency: 'USD',
+      recipientId: 'recipient_123',
+      status: 'pending',
+    }
+    prismaMock.payment.findUnique.mockReturnValue(payment);
+    const result = service.getPaymentById(payment.id);
+    expect(result).toBeDefined();
+    expect(prismaMock.payment.findUnique).toHaveBeenCalledWith({
+      where: {
+        id: payment.id,
+      },
+    });
+  });
+
+  it('should get all payments', () => {
+    const payments = [
+      {
+        id: 'payment_123',
+        amount: 100,
+        currency: 'USD',
+        recipientId: 'recipient_123',
+        status: 'pending',
+      },
+    ];
+    prismaMock.payment.findMany.mockReturnValue(payments);
+    const result = service.getPayments();
+    expect(result).toBeDefined();
+    expect(prismaMock.payment.findMany).toHaveBeenCalled();
   });
 });

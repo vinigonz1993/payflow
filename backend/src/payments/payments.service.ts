@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CreatePaymentDto } from './create-payment.dto.js';
+
 @Injectable()
 export class PaymentsService {
     constructor(private readonly prisma: PrismaService) {}
 
-
-    createPayment(data: any) {
+    createPayment(data: CreatePaymentDto) {
         return {
             id: 'payment_123',
             amount: data.amount,
@@ -18,6 +19,13 @@ export class PaymentsService {
         return this.prisma.payment.findMany({
             orderBy: {
                 createdAt: 'desc',
+            },
+        });
+    }
+    getPaymentById(id: string) {
+        return this.prisma.payment.findUnique({
+            where: {
+                id,
             },
         });
     }
