@@ -3,10 +3,12 @@ import { vi } from 'vitest';
 import { PaymentsController } from './payments.controller.js';
 import { PaymentsService } from './payments.service.js';
 import { CreatePaymentDto } from './create-payment.dto.js';
+import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface.js';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
   let paymentDto: CreatePaymentDto;
+  let user: AuthenticatedUser;
 
   const paymentServiceMock = {
     createPayment: vi.fn(),
@@ -32,6 +34,10 @@ describe('PaymentsController', () => {
       currency: 'USD',
       recipientId: 'recipient_123',
     };
+    user = {
+      id: 'user_123',
+      email: 'test@example.com',
+    };
   });
 
   it('should be defined', () => {
@@ -42,10 +48,16 @@ describe('PaymentsController', () => {
     paymentServiceMock.createPayment.mockReturnValue({
       id: 'payment_123',
       ...paymentDto,
+      userId: user.id,
       status: 'pending',
     });
-    const result = controller.createPayment(paymentDto);
+    const result = controller.createPayment(paymentDto, user);
+
     expect(result).toBeDefined();
+    expect(paymentServiceMock.createPayment).toHaveBeenCalledWith(
+      paymentDto,
+      user.id,
+    );
   });
 
   it('should retrieve a payment by id', () => {

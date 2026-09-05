@@ -10,7 +10,7 @@ build:
 	cd backend && npm run build
 
 db-start:
-	docker run --name payflow-postgres \
+	docker start payflow-postgres 2>nul || docker run --name payflow-postgres \
 		-e POSTGRES_USER=payflow \
 		-e POSTGRES_PASSWORD=payflow \
 		-e POSTGRES_DB=payflow \

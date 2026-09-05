@@ -39,10 +39,16 @@ describe('PaymentsService', () => {
       currency: 'USD',
       recipientId: 'recipient_123',
     };
-    expect(paymentDto).toBeDefined();
+    const userId = 'user_123';
 
-    const result = service.createPayment(paymentDto);
-    expect(result).toBeDefined();
+    const result = service.createPayment(paymentDto, userId);
+
+    expect(result).toEqual({
+      id: 'payment_123',
+      ...paymentDto,
+      userId,
+      status: 'pending',
+    });
   });
 
   it('should retrieve a payment by id', () => {
