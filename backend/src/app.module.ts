@@ -10,14 +10,14 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
   imports: [
-    ObserveModule.forRoot({
-      appKey: 'YOUR_APP_KEY',
-      appSecret: 'YOUR_APP_SECRET',
-      serviceId: 'backend',
-    }),
+    // ObserveModule.forRoot({
+    //   appKey: 'YOUR_APP_KEY',
+    //   appSecret: 'YOUR_APP_SECRET',
+    //   serviceId: 'backend',
+    // }),
+    AuthModule,
     PaymentsModule,
     PrismaModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,7 @@ import { PaymentsController } from './payments.controller.js';
 import { PaymentsService } from './payments.service.js';
 import { CreatePaymentDto } from './create-payment.dto.js';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -25,6 +26,10 @@ describe('PaymentsController', () => {
           useValue: paymentServiceMock,
         },
       ],
+    }).overrideGuard(
+      JwtAuthGuard
+    ).useValue({
+      canActivate: () => true
     }).compile();
 
     controller = module.get<PaymentsController>(PaymentsController);

@@ -1,7 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import bcrypt from 'bcrypt';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module.js';
+import { PrismaService } from '../../src/prisma/prisma.service.js';
 
 describe('Payments E2E', () => {
   let app: INestApplication;
@@ -9,21 +11,35 @@ describe('Payments E2E', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        AppModule
+      ],
     }).compile();
 
     app = moduleRef.createNestApplication();
 
     await app.init();
 
+    const prisma = app.get(PrismaService);
+    const password = 'password123';
+    const email = 'e2e@test.com';
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: {
+        email: email,
+        passwordHash: passwordHash,
+      },
+    });
+
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'e2e@test.com',
-        password: 'password123',
+        email,
+        password,
       });
 
-    token = loginResponse.body.access_token;
+    token = loginResponse.body.accessToken;
+    expect(token).toBeDefined();
   });
 
   afterAll(async () => {
@@ -31,7 +47,7 @@ describe('Payments E2E', () => {
   });
 
   it('should reject creating a payment without authentication', async () => {
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/payments')
       .send({
         amount: 100,
