@@ -33,7 +33,7 @@ describe('PaymentsService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a payment', () => {
+  it('should create a payment', async () => {
     const paymentDto: CreatePaymentDto = {
       amount: 100,
       currency: 'USD',
@@ -41,7 +41,24 @@ describe('PaymentsService', () => {
     };
     const userId = 'user_123';
 
-    const result = service.createPayment(paymentDto, userId);
+    prismaMock.payment.create.mockReturnValue({
+      id: 'payment_123',
+      ...paymentDto,
+      userId,
+      status: 'pending',
+    });
+
+    const result = await service.createPayment(paymentDto, userId);
+    expect(result).toBeDefined();
+    expect(prismaMock.payment.create).toHaveBeenCalledWith({
+      data: {
+        amount: paymentDto.amount,
+        currency: paymentDto.currency,
+        recipientId: paymentDto.recipientId,
+        userId: userId,
+        status: 'pending',
+      },
+    });
 
     expect(result).toEqual({
       id: 'payment_123',

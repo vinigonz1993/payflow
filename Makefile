@@ -34,3 +34,6 @@ db-stop:
 
 db-remove:
 	docker rm payflow-postgres
+
+lint:
+	cd backend && npm run lint

@@ -4,10 +4,12 @@ import bcrypt from 'bcrypt';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module.js';
 import { PrismaService } from '../../src/prisma/prisma.service.js';
+import TestAgent from 'supertest/lib/agent.js';
 
 describe('Payments E2E', () => {
   let app: INestApplication;
   let token: string;
+  let apiRequest: TestAgent;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -40,11 +42,14 @@ describe('Payments E2E', () => {
 
     token = loginResponse.body.accessToken;
     expect(token).toBeDefined();
+    apiRequest = request(app.getHttpServer());
   });
 
   afterAll(async () => {
     await app.close();
   });
+
+  const auth = (req: request.Test) => req.set('Authorization', `Bearer ${token}`);
 
   it('should reject creating a payment without authentication', async () => {
     const response = await request(app.getHttpServer())
@@ -55,12 +60,11 @@ describe('Payments E2E', () => {
         recipientId: 'recipient-123',
       })
       .expect(401);
+    expect(response.body).toHaveProperty('message');
   });
 
   it('should create a payment for the authenticated user', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/payments')
-      .set('Authorization', `Bearer ${token}`)
+    const response = await auth(apiRequest.post('/payments'))
       .send({
         amount: 100,
         currency: 'CAD',
@@ -74,23 +78,19 @@ describe('Payments E2E', () => {
   });
 
   it('should return the authenticated user payments', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/payments')
-      .set('Authorization', `Bearer ${token}`)
+    const response = await auth(apiRequest.get('/payments'))
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
   });
 
   it('should reject getting payments without authentication', async () => {
-    await request(app.getHttpServer())
-      .get('/payments')
+    await apiRequest.get('/payments')
       .expect(401);
   });
 
   it('should reject creating a payment with invalid token', async () => {
-    await request(app.getHttpServer())
-      .post('/payments')
+    await apiRequest.post('/payments')
       .set('Authorization', `Bearer invalidtoken`)
       .send({
         amount: 100,
@@ -98,5 +98,24 @@ describe('Payments E2E', () => {
         recipientId: 'recipient-123',
       })
       .expect(401);
+  });
+
+  it('Should return a payment by Id', async () => {
+    const createResponse = await auth(apiRequest.post('/payments'))
+      .send({
+        amount: 100,
+        currency: 'CAD',
+        recipientId: 'recipient-123',
+      })
+      .expect(201);
+
+    const paymentId = createResponse.body.id;
+
+    const response = await auth(apiRequest.get(`/payments/${paymentId}`))
+      .expect(200);
+
+    expect(response.body).toHaveProperty('id', paymentId);
+    expect(response.body.currency).toBe('CAD');
+    expect(Number(response.body.amount)).toBe(100);
   });
 });
