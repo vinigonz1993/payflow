@@ -1,8 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Body, Injectable } from '@nestjs/common';
+import { Body, Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { RegisterUserDto } from './dto/register.dt.js';
+import { RegisterUserDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 
 @Injectable()
@@ -12,14 +12,14 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) {}
 
-    async create(@Body() body: RegisterUserDto) {
+    async register(@Body() body: RegisterUserDto) {
         const existingUser = await this.prisma.user.findUnique({
             where: {
                 email: body.email,
             },
         });
         if (existingUser) {
-            throw new Error('User already exists');
+            throw new ConflictException('User already exists');
         }
 
         const passwordHash = await bcrypt.hash(body.password, 10);
@@ -41,7 +41,7 @@ export class AuthService {
             },
         });
         if (!user) {
-            throw new Error('Invalid credentials');
+            throw new UnauthorizedException('Invalid credentials');
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -49,7 +49,7 @@ export class AuthService {
             user.passwordHash
         );
         if (!isPasswordValid) {
-            throw new Error('Invalid credentials');
+            throw new UnauthorizedException('Invalid credentials');
         }
 
         const accessToken = await this.jwtService.signAsync({

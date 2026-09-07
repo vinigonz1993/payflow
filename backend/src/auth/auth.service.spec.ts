@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { vi } from 'vitest';
 import { AuthService } from './auth.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { RegisterUserDto } from './dto/register.dt.js';
+import { RegisterUserDto } from './dto/register.dto.js';
 import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
@@ -55,7 +55,7 @@ describe('AuthService', () => {
       email: userDto.email,
       passwordHash: 'hashedpassword',
     });
-    const user = await service.create(userDto);
+    const user = await service.register(userDto);
     expect(user).toHaveProperty('email', userDto.email);
     expect(user).not.toHaveProperty('passwordHash');
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
@@ -77,7 +77,7 @@ describe('AuthService', () => {
       email: userDto.email,
       passwordHash: 'hashedpassword',
     });
-    await expect(service.create(userDto)).rejects.toThrow('User already exists');
+    await expect(service.register(userDto)).rejects.toThrow('User already exists');
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
       where: {
         email: userDto.email,

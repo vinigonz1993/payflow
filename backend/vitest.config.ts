@@ -15,7 +15,8 @@ export default defineConfig({
     exclude: excludeFromTests,
     coverage: {
       provider: 'v8',
-      exclude: excludeFromTests
+      exclude: excludeFromTests,
+      skipFull: true
     }
   },
 });
