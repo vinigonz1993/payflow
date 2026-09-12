@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePaymentDto } from './create-payment.dto.js';
+import { PaymentEventsService } from '../payment-events/payment-events.service.js';
 
 @Injectable()
 export class PaymentsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly paymentEventsService: PaymentEventsService,
+    ) {}
 
-    createPayment(data: CreatePaymentDto, userId: string) {
-        return this.prisma.payment.create({
+    async createPayment(data: CreatePaymentDto, userId: string) {
+        const payment = await this.prisma.payment.create({
             data: {
                 amount: data.amount,
                 currency: data.currency,
@@ -16,6 +20,19 @@ export class PaymentsService {
                 status: 'pending',
             },
         });
+
+        await this.paymentEventsService.create(
+            payment.id,
+            'payment.created',
+            {
+                amount: data.amount,
+                currency: data.currency,
+                recipientId: data.recipientId,
+                userId,
+            }
+        )
+
+        return payment;
     }
     getPayments() {
         return this.prisma.payment.findMany({

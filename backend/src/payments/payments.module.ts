@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { PaymentsController } from './payments.controller.js';
 import { PaymentsService } from './payments.service.js';
 import { AuthModule } from '../auth/auth.module.js';
+import { PaymentEventModule } from '../payment-events/payment-events.module.js';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AuthModule } from '../auth/auth.module.js';
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),
+    PaymentEventModule
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService],

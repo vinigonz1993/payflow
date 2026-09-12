@@ -5,6 +5,7 @@ import { PaymentsService } from './payments.service.js';
 import { CreatePaymentDto } from './create-payment.dto.js';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { PaymentEventsService } from '../payment-events/payment-events.service.js';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -16,6 +17,10 @@ describe('PaymentsController', () => {
     getPaymentById: vi.fn(),
     getPayments: vi.fn(),
   };
+  const paymentEventServiceMock = {
+    create: vi.fn(),
+    findByPaymentId: vi.fn()
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +30,10 @@ describe('PaymentsController', () => {
           provide: PaymentsService,
           useValue: paymentServiceMock,
         },
+        {
+          provide: PaymentEventsService,
+          useValue: paymentEventServiceMock
+        }
       ],
     }).overrideGuard(
       JwtAuthGuard

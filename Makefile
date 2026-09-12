@@ -22,18 +22,13 @@ build:
 	cd backend && npm run build
 
 db-start:
-	docker start payflow-postgres 2>nul || docker run --name payflow-postgres \
-		-e POSTGRES_USER=payflow \
-		-e POSTGRES_PASSWORD=payflow \
-		-e POSTGRES_DB=payflow \
-		-p 5423:5432 \
-		-d postgres:17
+	cd backend && docker-compose up -d
 
 db-stop:
-	docker stop payflow-postgres
+	docker-compose stop
 
 db-remove:
-	docker rm payflow-postgres
+	docker-compose down
 
 lint:
 	cd backend && npm run lint

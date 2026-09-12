@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: payflow-postgres
+    ports:
+      - "5423:5432"
+    environment:
+      POSTGRES_USER: payflow
+      POSTGRES_PASSWORD: payflow
+      POSTGRES_DB: payflow
+
+  mongodb:
+    image: mongo:8
+    container_name: payflow-mongodb
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: payflow
+      MONGO_INITDB_ROOT_PASSWORD: payflow

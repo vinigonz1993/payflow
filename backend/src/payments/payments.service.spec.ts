@@ -3,17 +3,12 @@ import { PaymentsService } from './payments.service.js';
 import { CreatePaymentDto } from './create-payment.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { prismaMock } from '../../test/mocks/prisma.mock.js';
+import { PaymentEventsService } from '../payment-events/payment-events.service.js';
+import { mockPaymentEventsService } from '../../test/mocks/payment-events.mock.js';
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
-
-  const prismaMock = {
-    payment: {
-      findMany: vi.fn(),
-      create: vi.fn(),
-      findUnique: vi.fn(),
-    }
-  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,6 +18,10 @@ describe('PaymentsService', () => {
           provide: PrismaService,
           useValue: prismaMock,
         },
+        {
+          provide: PaymentEventsService,
+          useValue: mockPaymentEventsService
+        }
       ],
     }).compile();
 
