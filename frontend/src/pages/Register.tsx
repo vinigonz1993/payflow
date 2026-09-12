@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Card from '../components/Card';
 import Heading from '../components/Heading';
 import Input from '../components/Input';
@@ -11,20 +10,7 @@ import Field from '../components/Form/Field';
 import Label from '../components/Form/Label';
 import SubmitButton from '../components/Buttons/SubmitButton';
 import { BrandHeader } from '../components/Page';
-
-const ErrorMessage = styled.p`
-  margin: 0;
-  color: #f87171;
-  font-size: 13px;
-`;
-
-
-const Footer = styled.p`
-  margin: 24px 0 0;
-  text-align: center;
-  color: #6f788b;
-  font-size: 13px;
-`;
+import { ErrorMessage, AuthFooter } from '../components/auth/AuthStyles';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -113,10 +99,10 @@ export default function RegisterPage() {
             </SubmitButton>
           </Form>
 
-          <Footer>
+          <AuthFooter>
             Already have an account?{' '}
             <Link to="/login">Sign in</Link>
-          </Footer>
+          </AuthFooter>
         </Card>
     </>
   );

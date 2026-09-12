@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import Card from '../components/Card';
-import Heading from '../components/Heading';
 import Input from '../components/Input';
+import Heading from '../components/Heading';
 import { useAppDispatch } from '../app/hooks';
 import { login } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
@@ -11,84 +10,17 @@ import Field from '../components/Form/Field';
 import Label from '../components/Form/Label';
 import SubmitButton from '../components/Buttons/SubmitButton';
 import { BrandHeader } from '../components/Page';
-
-const InputWrapper = styled.div`
-  position: relative;
-`;
-
-const PasswordInput = styled(Input)`
-  padding-right: 70px;
-`;
-
-const TogglePassword = styled.button`
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  border: 0;
-  background: transparent;
-
-  color: #737c90;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover {
-    color: #aeb6c8;
-  }
-`;
-
-const Options = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  font-size: 13px;
-`;
-
-const Remember = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: #858da0;
-  cursor: pointer;
-
-  input {
-    width: 15px;
-    height: 15px;
-    accent-color: #6366f1;
-    cursor: pointer;
-  }
-`;
-
-const Link = styled.a`
-  color: #818cf8;
-  text-decoration: none;
-  font-weight: 600;
-
-  &:hover {
-    color: #a5b4fc;
-  }
-`;
-
-
-const Register = styled.p`
-  margin: 24px 0 0;
-
-  text-align: center;
-  color: #6f788b;
-  font-size: 13px;
-`;
-
-const Footer = styled.p`
-  margin: 24px 0 0;
-
-  text-align: center;
-  color: #41495b;
-  font-size: 11px;
-`;
+import { toast } from 'react-toastify';
+import {
+  InputWrapper,
+  PasswordInput,
+  TogglePassword,
+  Options,
+  Remember,
+  AuthLink,
+  RegisterPrompt,
+  AuthFooter,
+} from '../components/auth/AuthStyles';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -102,6 +34,9 @@ export default function LoginPage() {
 
     if (login.fulfilled.match(result)) {
       navigate('/dashboard');
+    }
+    if (login.rejected.match(result)) {
+      toast.error('Login failed. Please check your credentials and try again.');
     }
   }
   const [showPassword, setShowPassword] = useState(false);
@@ -119,22 +54,24 @@ export default function LoginPage() {
             <Field>
               <Label htmlFor="email">Email address</Label>
 
-              <Input
+              <InputWrapper>
+                <Input
                 id="email"
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
               />
+              </InputWrapper>
             </Field>
 
             <Field>
               <Options>
                 <Label htmlFor="password">Password</Label>
 
-                <Link href="/forgot-password">
+                <AuthLink href="/forgot-password">
                   Forgot password?
-                </Link>
+                </AuthLink>
               </Options>
 
               <InputWrapper>
@@ -167,15 +104,15 @@ export default function LoginPage() {
             </SubmitButton>
           </Form>
 
-          <Register>
+          <RegisterPrompt>
             Don't have an account?{' '}
-            <Link href="/register">Create an account</Link>
-          </Register>
+            <AuthLink href="/register">Create an account</AuthLink>
+          </RegisterPrompt>
         </Card>
 
-        <Footer>
+        <AuthFooter>
           © 2026 PayFlow. Secure payments, simplified.
-        </Footer>
+        </AuthFooter>
     </>
   );
 }
